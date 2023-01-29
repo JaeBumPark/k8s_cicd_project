@@ -10,8 +10,8 @@ pipeline {
   stages {
     stage('Checkout Application Git Branch') {
         steps {
-            git credentialsId: 'dduddu00',
-                url: 'https://github.com/dduddu00/CICD.git', /* URL변경에 따른 수정 필요 */
+            git credentialsId: 'jp_git',
+                url: 'https://github.com/JaeBumPark/k8s_cicd_project.git', /* URL변경에 따른 수정 필요 */
                 branch: 'main'
         }
         post {
@@ -25,7 +25,7 @@ pipeline {
     }
     stage('git scm update') {
       steps {
-        git url: 'https://github.com/dduddu00/CICD.git', branch: 'main'
+        git url: 'https://github.com/JaeBumPark/k8s_cicd_project.git', branch: 'main'
       }
     }
     stage('docker login') {
@@ -53,15 +53,15 @@ pipeline {
 
      stage('K8S Manifest Update') {
        steps {
-            git credentialsId: 'dduddu00',
-                url: 'https://github.com/dduddu00/CICD.git', /* URL변경에 따른 수정 필요 */
+            git credentialsId: 'jp_git',
+                url: 'https://github.com/JaeBumPark/k8s_cicd_project.git', /* URL변경에 따른 수정 필요 */
                 branch: 'main'
-            sh "git config --global user.email 'tndusdlsms@nate.com'"
-            sh "git config --global user.name 'dduddu00'"
+            sh "git config --global user.email 'jackj29@naver.com'"
+            sh "git config --global user.name 'JaeBumPark'"
             sh "sed -i 's|ng:.*|ng:${BUILD_NUMBER}|g' kyo.yml "  
             sh "git add kyo.yml"
             sh "git commit -m '[UPDATE] POD ${BUILD_NUMBER} image versioning'" 
-            sshagent (credentials: ['jenkey2']) {
+            sshagent (credentials: ['jp_key']) {
                 sh "git remote set-url origin git@github.com:dduddu00/CICD.git"
                 sh "git push origin main"
             }  
