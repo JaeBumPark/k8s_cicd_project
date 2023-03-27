@@ -19,12 +19,10 @@ spec:
       serviceAccountName: jenkins-admin
       containers:
         - name: jenkins
-          image: kyontoki/jenkins:3.0
+          image: kyontoki/jenkins:1.0
           volumeMounts:
-            - mountPath: /var/run/
-              name: docker-volumes 
-            - mountPath: /var/jenkins_home
-              name: jenkins-vol
+          - mountPath: /var/run/
+            name: docker-volumes
           resources:
             limits:
               memory: "2Gi"
@@ -54,11 +52,29 @@ spec:
             timeoutSeconds: 5
             failureThreshold: 3
       volumes:
-        - name: docker-volumes
-          hostPath:
-            path: /var/run/
-            type: Directory
-        - name: jenkins-vol
-          hostPath:
-            path: /jen_pv
-            type: Directory
+      - name: docker-volumes
+        hostPath:
+          path: /var/run/
+          type: Directory
+      - name: jenkins-vol
+        hostPath:
+          path: /jen_pv
+          type: Directory
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: jenkins-service
+  namespace: jenkins
+  annotations:
+      prometheus.io/scrape: 'true'
+      prometheus.io/path:   /
+      prometheus.io/port:   '8080'
+spec:
+  selector:
+    app: jenkins-server
+  type: NodePort
+  ports:
+    - port: 8080
+      targetPort: 8080
+      nodePort: 32344
